@@ -1,7 +1,10 @@
 import pygame
+from queue import PriorityQueue
 
 SIZE = 600 # length of width and height
 SQUARES = 30 # number of squares in each row and column
+
+SQUARE_SIZE = SIZE // SQUARES # length of each square
 
 WIN = pygame.display.set_mode((SIZE, SIZE))
 FPS = 60
@@ -33,6 +36,13 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
+
+            # check if left mouse button is pressed
+            if pygame.mouse.get_pressed()[0]:
+                clicked_position = pygame.mouse.get_pos()
+                row, col = get_clicked_node_position(clicked_position)
+                node = grid[row][col]
+                node.colour = colours["red"]
         
         draw(grid)
 
@@ -40,12 +50,11 @@ def main():
 
 def new_grid():
     grid = []
-    square_size = SIZE // SQUARES # length of each square
     
     for row in range(SQUARES):
         grid.append([])
         for col in range(SQUARES):
-            node = Node(row, col, square_size)
+            node = Node(row, col, SQUARE_SIZE)
             grid[row].append(node)
 
     return grid
@@ -59,13 +68,20 @@ def draw(grid):
             node.draw()
 
     # draw lines
-    square_size = SIZE // SQUARES
     for row in range(SQUARES):
-        pygame.draw.line(WIN, colours["grey"], (0, row * square_size), (SIZE, row * square_size)) # horizontal lines
+        pygame.draw.line(WIN, colours["grey"], (0, row * SQUARE_SIZE), (SIZE, row * SQUARE_SIZE)) # horizontal lines
     for col in range(SQUARES):
-        pygame.draw.line(WIN, colours["grey"], (col * square_size, 0), (col * square_size, SIZE)) # vertical lines
+        pygame.draw.line(WIN, colours["grey"], (col * SQUARE_SIZE, 0), (col * SQUARE_SIZE, SIZE)) # vertical lines
 
     pygame.display.update()
+
+def get_clicked_node_position(position):
+    x, y = position
+
+    row = x // SQUARE_SIZE
+    col = y // SQUARE_SIZE
+
+    return row, col
 
 class Node:
     def __init__(self, row, col, size):
@@ -78,6 +94,9 @@ class Node:
 
     def draw(self):
         pygame.draw.rect(WIN, self.colour, (self.x_pos, self.y_pos, self.size, self.size))
+
+    def get_position(self):
+        return self.row, self.col
 
 
 if __name__ == '__main__':
