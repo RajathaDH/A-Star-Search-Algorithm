@@ -1,5 +1,4 @@
 import pygame
-from queue import PriorityQueue
 
 SIZE = 600 # length of width and height
 SQUARES = 30 # number of squares in each row and column
